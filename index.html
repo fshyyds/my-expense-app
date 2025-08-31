@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的记账本</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="记账本">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info">
+                <h1>💰 我的记账本</h1>
+                <div class="current-user" id="currentUser">
+                    <span id="userName">请选择用户</span>
+                    <button id="switchUserBtn" class="user-btn">切换</button>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="add">记账</button>
+                <button class="tab-btn" data-tab="stats">统计</button>
+                <button class="tab-btn" data-tab="history">历史</button>
+                <button class="tab-btn" data-tab="settings">设置</button>
+            </div>
+        </header>
+        
+        <!-- 记账页面 -->
+        <div class="tab-content" id="addTab">
+            <div class="add-expense">
+                <div class="input-group">
+                    <label for="amountInput">金额 ¥</label>
+                    <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="categorySelect">分类</label>
+                    <select id="categorySelect">
+                        <option value="food">🍜 餐饮</option>
+                        <option value="transport">🚗 交通</option>
+                        <option value="shopping">🛒 购物</option>
+                        <option value="entertainment">🎬 娱乐</option>
+                        <option value="health">🏥 医疗</option>
+                        <option value="education">📚 教育</option>
+                        <option value="housing">🏠 住房</option>
+                        <option value="other">📝 其他</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="noteInput">备注</label>
+                    <input type="text" id="noteInput" placeholder="可选填写...">
+                </div>
+                
+                <div class="input-group">
+                    <label for="dateInput">日期</label>
+                    <input type="date" id="dateInput">
+                </div>
+                
+                <button id="addExpenseBtn" class="add-btn">记录消费</button>
+            </div>
+        </div>
+        
+        <!-- 统计页面 -->
+        <div class="tab-content hidden" id="statsTab">
+            <div class="stats-period">
+                <button class="period-btn active" data-period="day">今日</button>
+                <button class="period-btn" data-period="week">本周</button>
+                <button class="period-btn" data-period="month">本月</button>
+                <button class="period-btn" data-period="year">今年</button>
+            </div>
+            
+            <div class="stats-summary">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalExpense">¥0.00</div>
+                    <div class="stat-label">总支出</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="expenseCount">0</div>
+                    <div class="stat-label">消费次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgExpense">¥0.00</div>
+                    <div class="stat-label">平均消费</div>
+                </div>
+            </div>
+            
+            <div class="category-stats" id="categoryStats">
+                <!-- 分类统计将在这里显示 -->
+            </div>
+        </div>
+        
+        <!-- 历史记录页面 -->
+        <div class="tab-content hidden" id="historyTab">
+            <div class="history-filter">
+                <input type="month" id="historyMonth">
+                <button id="filterBtn">筛选</button>
+            </div>
+            
+            <div class="expense-list" id="expenseList">
+                <!-- 历史记录将在这里显示 -->
+            </div>
+            
+            <div class="empty-state" id="emptyState">
+                <p>📊 暂无消费记录</p>
+                <p>开始记录您的第一笔消费吧！</p>
+            </div>
+        </div>
+        
+        <!-- 设置页面 -->
+        <div class="tab-content hidden" id="settingsTab">
+            <div class="settings-section">
+                <h3>📊 数据统计</h3>
+                <div class="data-info">
+                    <div class="info-item">
+                        <span>总记录数：</span>
+                        <span id="totalRecords">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>最早记录：</span>
+                        <span id="firstRecord">无</span>
+                    </div>
+                    <div class="info-item">
+                        <span>数据大小：</span>
+                        <span id="dataSize">0 KB</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>💾 数据管理</h3>
+                <div class="action-buttons">
+                    <button id="exportJsonBtn" class="action-btn export">
+                        📤 导出JSON (备份用)
+                    </button>
+                    <button id="exportTxtBtn" class="action-btn export">
+                        📝 导出文本账单
+                    </button>
+                    <button id="importBtn" class="action-btn import">
+                        📥 导入数据
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+                <div class="data-note">
+                    <p>💡 导出的数据包含所有消费记录，可用于备份或迁移到其他设备</p>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>🔧 应用设置</h3>
+                <div class="action-buttons">
+                    <button id="clearDataBtn" class="action-btn danger">
+                        🗑️ 清空所有数据
+                    </button>
+                </div>
+                <div class="data-note">
+                    <p>⚠️ 清空数据后无法恢复，建议先导出备份</p>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>🔄 数据同步说明</h3>
+                <div class="sync-info">
+                    <div class="info-card important">
+                        <h4>💡 数据存储机制</h4>
+                        <p>• 数据存储在<strong>各设备的浏览器本地</strong></p>
+                        <p>• 手机APP和电脑网页的数据<strong>独立存储</strong></p>
+                        <p>• 不会自动同步，需要手动导入导出</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>📱 多设备使用方法</h4>
+                        <p>1. 在主设备记账并定期导出备份</p>
+                        <p>2. 其他设备通过导入功能同步数据</p>
+                        <p>3. 建议以手机为主，电脑为辅</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>ℹ️ 应用信息</h3>
+                <div class="app-info">
+                    <div class="info-item">
+                        <span>版本：</span>
+                        <span>1.1.0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>更新时间：</span>
+                        <span>2024年8月</span>
+                    </div>
+                    <div class="info-item">
+                        <span>新增功能：</span>
+                        <span>文本导出、数据同步说明</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户选择模态框 -->
+        <div class="modal" id="userModal">
+            <div class="modal-content">
+                <h2>👤 用户管理</h2>
+                <p class="modal-desc">选择或创建您的个人账户，每个用户的消费记录完全独立</p>
+                
+                <div class="user-list" id="userList">
+                    <!-- 用户列表将在这里显示 -->
+                </div>
+                
+                <div class="new-user-section">
+                    <h3>创建新用户</h3>
+                    <div class="input-group">
+                        <input type="text" id="newUserName" placeholder="输入用户名 (如：小明、妈妈、爸爸)" maxlength="10">
+                        <button id="createUserBtn" class="create-btn">创建</button>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancelUserBtn" class="cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
